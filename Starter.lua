@@ -195,7 +195,7 @@ Template.Items["Fling"] = function(tab)
     end)
 end
 
-Template["Instant Interact"] = function(tab)
+Template.Items["Instant Interact"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Instant Interact", Default = false, Callback = function(state)
         if connections["Instant Interact"] then connections["Instant Interact"]:Disconnect() end 
         if not state then return end 
