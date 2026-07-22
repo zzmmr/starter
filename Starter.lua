@@ -222,7 +222,7 @@ Template.Items["WalkSpeed"] = function(tab)
         Max = 300,
         Rounding = 1,
         Callback = function(value) 
-            if not Template.Options.SpeedToggle.Value then return end 
+            if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
             client.Humanoid["WalkSpeed"] = value 
         end,
     })
@@ -256,7 +256,7 @@ Template.Items["JumpPower"] = function(tab)
         Max = useJumpPower and 500 or 100,
         Rounding = 1,
         Callback = function(value) 
-            if not Template.Options.JumpToggle.Value then return end 
+            if not Template.Options.JumpToggle or not Template.Options.JumpToggle.Value then return end 
             client.Humanoid[property] = value 
         end,
     })
@@ -287,7 +287,7 @@ Template.Items["HipHeight"] = function(tab)
         Max = 100,
         Rounding = 1,
         Callback = function(value) 
-            if not Template.Options.HipHeightToggle.Value then return end 
+            if not Template.Options.HipHeightToggle or not Template.Options.HipHeightToggle.Value then return end 
             client.Humanoid["HipHeight"] = value 
         end,
     })
@@ -319,7 +319,7 @@ Template.Items["Gravity"] = function(tab)
         Max = 500,
         Rounding = 1,
         Callback = function(value)
-            if not Template.Options.GravityToggle.Value then return end 
+            if not Template.Options.GravityToggle or not Template.Options.GravityToggle.Value then return end 
             workspace.Gravity = value
         end,
     })
@@ -332,7 +332,7 @@ Template.Items["Gravity"] = function(tab)
 end
 
 Template.Items["Noclip"] = function(tab)
-    tab:AddToggle(createSeed(), {Title = "Fullbright", Default = false, Callback = function(state)
+    tab:AddToggle(createSeed(), {Title = "Noclip", Default = false, Callback = function(state)
         for i, v in client.Character:GetDescendants() do
             if v:IsA("BasePart") and v.CanCollide == state then
                 v.CanCollide = not state
@@ -388,7 +388,7 @@ Template.Items["FPS Cap"] = function(tab)
         Max = 500,
         Rounding = 1,
         Callback = function(value)
-            if not Template.Options.FPSToggle.Value then return end 
+            if not Template.Options.FPSToggle or not Template.Options.FPSToggle.Value then return end 
             setfpscap(value)
         end,
     })
