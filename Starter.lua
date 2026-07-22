@@ -58,7 +58,8 @@ function Template:Import(_, item: string, tab)
     return true
 end
 
-function Template:BuildHomeSection(_, tab, LRM_TotalExecutions, LRM_SecondsLeft)
+function Template:BuildHomeSection(b, tab, LRM_TotalExecutions, LRM_SecondsLeft)
+    print(b, tab, LRM_TotalExecutions, LRM_SecondsLeft)
     local function secondsToFormattedDate(secondsLeft)
         local t = os.time() + (tonumber(secondsLeft) or 0)
         local hour = tonumber(os.date("%I", t))
