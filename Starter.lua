@@ -304,7 +304,7 @@ end
 Template.Items["Gravity"] = function(tab)
     local function handleGravity()
         if connections["Gravity"] then connections["Gravity"]:Disconnect(); connections["Gravity"] = nil end
-        if not Template.Options.GravityToggle.Value then return end
+        if not Template.Options.GravityToggle or not Template.Options.GravityToggle.Value then return end
         connections["Gravity"] = workspace:GetPropertyChangedSignal("Gravity"):Connect(function()
             workspace.Gravity = Template.Options.GravitySlider.Value
         end)
