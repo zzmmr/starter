@@ -52,10 +52,45 @@ defaults.FogStart = Services.Lighting.FogStart
 defaults.FogEnd = Services.Lighting.FogEnd 
 defaults.Gravity= workspace.Gravity
 
-function Template:Import(item: string, tab)
+function Template:Import(_, item: string, tab)
     if not Template.Items[item] then return end 
     Template.Items[item](tab)
     return true
+end
+
+function Template:BuildHomeSection(_, tab, LRM_TotalExecutions, LRM_SecondsLeft)
+    local function secondsToFormattedDate(secondsLeft)
+        local t = os.time() + (tonumber(secondsLeft) or 0)
+        local hour = tonumber(os.date("%I", t))
+        local minute = tonumber(os.date("%M", t))
+        local ampm = os.date("%p", t)
+        local dateStr = os.date("%B %d, %Y", t):gsub("(%d)", "%1") 
+        return string.format("%s %d:%02d %s", dateStr, hour, minute, ampm)
+    end
+
+    tab:AddSection("▶ Information")
+    local sessionTime = tab:AddParagraph("sessionTime", {Title = "Session Time", Content = "0"})
+
+    tab:AddSection("▶ Key Data")
+    tab:AddParagraph("", {Title = "Total Executions", Content =  (LRM_TotalExecutions or 0) .. " Executions"})
+    tab:AddParagraph("", {Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft or 0)})
+
+    tab:AddSection("▶ Discord")
+    tab:AddButton({Title = "Copy Discord Invite", Description = "Copies the Discord invite link to your clipboard.", Callback = function() setclipboard("https://discord.gg/7MJrswRyJX") end})
+    
+    task.spawn(function()
+        local startTime = tick()
+
+        while true do
+            local elapsed = tick() - startTime
+            sessionTime:SetValue(string.format("%02d:%02d:%02d", 
+                math.floor(elapsed / 3600),  
+                math.floor((elapsed % 3600) / 60), 
+                math.floor(elapsed % 60)
+            ))
+            task.wait(1)
+        end
+    end)
 end
 
 Template.Items["No Fog"] = function(tab)
