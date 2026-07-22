@@ -1,5 +1,6 @@
-local Starter = {
-    Items = {}
+local Template = {
+    Items = {},
+    Options = nil, 
 }
 
 local Services = {
@@ -16,7 +17,6 @@ local Services = {
 }
 
 local player = Services.Players.LocalPlayer 
-local Options = Fluent.Options 
 
 local client = {}
 local defaults = {}
@@ -52,20 +52,20 @@ defaults.FogStart = Services.Lighting.FogStart
 defaults.FogEnd = Services.Lighting.FogEnd 
 defaults.Gravity= workspace.Gravity
 
-function Starter:Import(item: string, tab)
-    if not Starter[item] then return end 
-    Starter.Items[item](tab)
+function Template:Import(item: string, tab)
+    if not Template[item] then return end 
+    Template.Items[item](tab)
     return true
 end
 
-Starter.Items["No Fog"] = function(tab)
+Template.Items["No Fog"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "No Fog", Default = false, Callback = function(state)
         Services.Lighting.FogStart = state and 999999 or defaults.FogStart 
         Services.Lighting.FogEnd = state and 999999 or defaults.FogEnd 
     end})
 end
 
-Starter.Items["Fling"] = function(tab)
+Template.Items["Fling"] = function(tab)
     local env = {}
 
     local function FPos(BasePart, Pos, Ang)
@@ -148,7 +148,7 @@ Starter.Items["Fling"] = function(tab)
     })
 
     tab:AddButton({Title = "Fling Player", Description = "", Callback = function()
-        pcall(fling, Options.flingPlayerDropdown.Value)
+        pcall(fling, Template.Options.flingPlayerDropdown.Value)
     end})
 
     Services.Players.PlayerAdded:Connect(function(plr)
@@ -160,7 +160,7 @@ Starter.Items["Fling"] = function(tab)
     end)
 end
 
-Starter["Instant Interact"] = function(tab)
+Template["Instant Interact"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Instant Interact", Default = false, Callback = function(state)
         if connections["Instant Interact"] then connections["Instant Interact"]:Disconnect() end 
         if not state then return end 
@@ -170,14 +170,14 @@ Starter["Instant Interact"] = function(tab)
     end})
 end
 
-Starter.Items["WalkSpeed"] = function(tab)
+Template.Items["WalkSpeed"] = function(tab)
     local function handleSpeed()
         if connections["WalkSpeed"] then connections["WalkSpeed"]:Disconnect() end
-        if not Options.SpeedToggle.Value then return end 
+        if not Template.Options.SpeedToggle.Value then return end 
         connections["WalkSpeed"] = client.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-            client.Humanoid.WalkSpeed = Options.WalkSpeedSlider.Value
+            client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
         end)
-        client.Humanoid.WalkSpeed = Options.WalkSpeedSlider.Value
+        client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
     end 
     tab:AddSlider("WalkSpeedSlider", {
         Title = "Walk Speed",
@@ -187,7 +187,7 @@ Starter.Items["WalkSpeed"] = function(tab)
         Max = 300,
         Rounding = 1,
         Callback = function(value) 
-            if not Options.SpeedToggle.Value then return end 
+            if not Template.Options.SpeedToggle.Value then return end 
             client.Humanoid["WalkSpeed"] = value 
         end,
     })
@@ -200,17 +200,17 @@ Starter.Items["WalkSpeed"] = function(tab)
     table.insert(characterAddedConnections, handleSpeed)
 end
 
-Starter.Items["JumpPower"] = function(tab)
+Template.Items["JumpPower"] = function(tab)
     local useJumpPower = client.Humanoid.UseJumpPower
     local property = client.Humanoid.UseJumpPower and "JumpPower" or "JumpHeight"
 
     local function handleJump()
         if connections["JumpPower"] then connections["JumpPower"]:Disconnect() end
-        if not Options.JumpToggle.Value then return end
+        if not Template.Options.JumpToggle.Value then return end
         connections["JumpPower"] = client.Humanoid:GetPropertyChangedSignal(property):Connect(function()
-            client.Humanoid[property] = Options.JumpPowerSlider.Value
+            client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
         end)
-        client.Humanoid[property] = Options.JumpPowerSlider.Value
+        client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
     end
 
     tab:AddSlider("JumpPowerSlider", {
@@ -221,7 +221,7 @@ Starter.Items["JumpPower"] = function(tab)
         Max = useJumpPower and 500 or 100,
         Rounding = 1,
         Callback = function(value) 
-            if not Options.JumpToggle.Value then return end 
+            if not Template.Options.JumpToggle.Value then return end 
             client.Humanoid[property] = value 
         end,
     })
@@ -234,14 +234,14 @@ Starter.Items["JumpPower"] = function(tab)
     table.insert(characterAddedConnections, handleJump)
 end
 
-Starter.Items["HipHeight"] = function(tab)
+Template.Items["HipHeight"] = function(tab)
     local function handleHipHeight()
         if connections["HipHeight"] then connections["HipHeight"]:Disconnect() end
-        if not Options.HipHeightToggle.Value then return end
+        if not Template.Options.HipHeightToggle.Value then return end
         connections["HipHeight"] = client.Humanoid:GetPropertyChangedSignal("HipHeight"):Connect(function()
-            client.Humanoid.HipHeight = Options.HipHeightSlider.Value
+            client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
         end)
-        client.Humanoid.HipHeight = Options.HipHeightSlider.Value
+        client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
     end
 
     tab:AddSlider("HipHeightSlider", {
@@ -252,7 +252,7 @@ Starter.Items["HipHeight"] = function(tab)
         Max = 100,
         Rounding = 1,
         Callback = function(value) 
-            if not Options.HipHeightToggle.Value then return end 
+            if not Template.Options.HipHeightToggle.Value then return end 
             client.Humanoid["HipHeight"] = value 
         end,
     })
@@ -266,14 +266,14 @@ Starter.Items["HipHeight"] = function(tab)
     table.insert(characterAddedConnections, handleHipHeight)
 end
 
-Starter.Items["Gravity"] = function(tab)
+Template.Items["Gravity"] = function(tab)
     local function handleGravity()
         if connections["Gravity"] then connections["Gravity"]:Disconnect(); connections["Gravity"] = nil end
-        if not Options.GravityToggle.Value then return end
+        if not Template.Options.GravityToggle.Value then return end
         connections["Gravity"] = workspace:GetPropertyChangedSignal("Gravity"):Connect(function()
-            workspace.Gravity = Options.GravitySlider.Value
+            workspace.Gravity = Template.Options.GravitySlider.Value
         end)
-        workspace.Gravity = Options.GravitySlider.Value
+        workspace.Gravity = Template.Options.GravitySlider.Value
     end
 
     tab:AddSlider("GravitySlider", {
@@ -284,7 +284,7 @@ Starter.Items["Gravity"] = function(tab)
         Max = 500,
         Rounding = 1,
         Callback = function(value)
-            if not Options.GravityToggle.Value then return end 
+            if not Template.Options.GravityToggle.Value then return end 
             workspace.Gravity = value
         end,
     })
@@ -296,7 +296,7 @@ Starter.Items["Gravity"] = function(tab)
     end})
 end
 
-Starter.Items["Noclip"] = function(tab)
+Template.Items["Noclip"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Fullbright", Default = false, Callback = function(state)
         for i, v in client.Character:GetDescendants() do
             if v:IsA("BasePart") and v.CanCollide == state then
@@ -306,7 +306,7 @@ Starter.Items["Noclip"] = function(tab)
     end})
 end
 
-Starter.Items["Fullbright"] = function(tab)
+Template.Items["Fullbright"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Fullbright", Default = false, Callback = function(state)
         Services.Lighting.FogStart = state and 999999 or defaults.FogStart 
         Services.Lighting.FogEnd = state and 999999 or defaults.FogEnd 
@@ -316,7 +316,7 @@ Starter.Items["Fullbright"] = function(tab)
     end})
 end
 
-Starter.Items["Infinite Jump"] = function(tab)
+Template.Items["Infinite Jump"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Infinite Jump", Default = false, Callback = function(state)
         if connections["Infinite Jump"] then connections["Infinite Jump"]:Disconnect() end 
         if not state then return end 
@@ -326,7 +326,7 @@ Starter.Items["Infinite Jump"] = function(tab)
     end})
 end
 
-Starter.Items["Anti Afk"] = function(tab)
+Template.Items["Anti Afk"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Anti-Afk", Default = false, Callback = function(state)
         if connections["Anti-Afk"] then connections["Anti-Afk"]:Disconnect() end 
         if not state then return end 
@@ -337,14 +337,14 @@ Starter.Items["Anti Afk"] = function(tab)
     end})
 end
 
-Starter.Items["No Rendering"] = function(tab)
+Template.Items["No Rendering"] = function(tab)
     Services.RunService:Set3dRenderingEnabled(false)
     tab:AddToggle(createSeed(), {Title = "No Rendering", Default = false, Callback = function(state)
         Services.RunService:Set3dRenderingEnabled(not state)
     end})
 end
 
-Starter.Items["FPS Cap"] = function(tab)
+Template.Items["FPS Cap"] = function(tab)
     tab:AddSlider("FpsSlider", {
         Title = "FPS Cap",
         Description = "",
@@ -353,7 +353,7 @@ Starter.Items["FPS Cap"] = function(tab)
         Max = 500,
         Rounding = 1,
         Callback = function(value)
-            if not Options.FPSToggle.Value then return end 
+            if not Template.Options.FPSToggle.Value then return end 
             setfpscap(value)
         end,
     })
@@ -362,12 +362,12 @@ Starter.Items["FPS Cap"] = function(tab)
             setfpscap(120)
             return
         end
-        setfpscap(Options.FpsSlider.Value)
+        setfpscap(Template.Options.FpsSlider.Value)
     end})
     
 end
 
-Starter.Items["Fly"] = function(tab)
+Template.Items["Fly"] = function(tab)
     local FLY_SPEED = 60
 
     local attachment, linearVelocity, alignOrientation
@@ -454,4 +454,4 @@ Starter.Items["Fly"] = function(tab)
     end})
 end
 
-return Starter
+return Template
