@@ -208,7 +208,7 @@ end
 Template.Items["WalkSpeed"] = function(tab)
     local function handleSpeed()
         if connections["WalkSpeed"] then connections["WalkSpeed"]:Disconnect() end
-        if not Template.Options.SpeedToggle.Value then return end 
+        if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
         connections["WalkSpeed"] = client.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
             client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
         end)
@@ -241,7 +241,7 @@ Template.Items["JumpPower"] = function(tab)
 
     local function handleJump()
         if connections["JumpPower"] then connections["JumpPower"]:Disconnect() end
-        if not Template.Options.JumpToggle.Value then return end
+        if not Template.Options.JumpToggle or not Template.Options.JumpToggle.Value then return end
         connections["JumpPower"] = client.Humanoid:GetPropertyChangedSignal(property):Connect(function()
             client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
         end)
@@ -272,7 +272,7 @@ end
 Template.Items["HipHeight"] = function(tab)
     local function handleHipHeight()
         if connections["HipHeight"] then connections["HipHeight"]:Disconnect() end
-        if not Template.Options.HipHeightToggle.Value then return end
+        if not Template.Options.HipHeightToggle or not Template.Options.HipHeightToggle.Value then return end
         connections["HipHeight"] = client.Humanoid:GetPropertyChangedSignal("HipHeight"):Connect(function()
             client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
         end)
