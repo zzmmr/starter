@@ -52,14 +52,13 @@ defaults.FogStart = Services.Lighting.FogStart
 defaults.FogEnd = Services.Lighting.FogEnd 
 defaults.Gravity= workspace.Gravity
 
-function Template:Import(_, item: string, tab)
+function Template:Import(item: string, tab)
     if not Template.Items[item] then return end 
     Template.Items[item](tab)
     return true
 end
 
-function Template:BuildHomeSection(b, tab, LRM_TotalExecutions, LRM_SecondsLeft)
-    print(b, tab, LRM_TotalExecutions, LRM_SecondsLeft)
+function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
     local function secondsToFormattedDate(secondsLeft)
         local t = os.time() + (tonumber(secondsLeft) or 0)
         local hour = tonumber(os.date("%I", t))
