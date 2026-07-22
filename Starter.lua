@@ -53,7 +53,7 @@ defaults.FogEnd = Services.Lighting.FogEnd
 defaults.Gravity= workspace.Gravity
 
 function Template:Import(item: string, tab)
-    if not Template[item] then return end 
+    if not Template.Items[item] then return end 
     Template.Items[item](tab)
     return true
 end
