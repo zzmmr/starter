@@ -60,12 +60,15 @@ end
 
 function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
     local function secondsToFormattedDate(secondsLeft)
-        local t = os.time() + (tonumber(secondsLeft) or 0)
-        local hour = tonumber(os.date("%I", t))
-        local minute = tonumber(os.date("%M", t))
-        local ampm = os.date("%p", t)
-        local dateStr = os.date("%B %d, %Y", t):gsub("(%d)", "%1") 
-        return string.format("%s %d:%02d %s", dateStr, hour, minute, ampm)
+        local succ, result = pcall(function()
+            local t = os.time() + (tonumber(secondsLeft) or 0)
+            local hour = tonumber(os.date("%I", t))
+            local minute = tonumber(os.date("%M", t))
+            local ampm = os.date("%p", t)
+            local dateStr = os.date("%B %d, %Y", t):gsub("(%d)", "%1") 
+            return string.format("%s %d:%02d %s", dateStr, hour, minute, ampm)
+        end)
+        return succ and result or "Couldn't format date."
     end
 
     tab:AddSection("▶ Information")
@@ -73,7 +76,7 @@ function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
 
     tab:AddSection("▶ Key Data")
     tab:AddParagraph("", {Title = "Total Executions", Content =  (LRM_TotalExecutions or 0) .. " Executions"})
-    tab:AddParagraph("", {Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft or 0)})
+    tab:AddParagraph("", {Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft)})
 
     tab:AddSection("▶ Discord")
     tab:AddButton({Title = "Copy Discord Invite", Description = "Copies the Discord invite link to your clipboard.", Callback = function() setclipboard("https://discord.gg/7MJrswRyJX") end})
