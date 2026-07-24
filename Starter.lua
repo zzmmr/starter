@@ -97,9 +97,15 @@ function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
 end
 
 Template.Items["No Fog"] = function(tab)
-    tab:AddToggle(createSeed(), {Title = "No Fog", Default = false, Callback = function(state)
-        Services.Lighting.FogStart = state and 999999 or defaults.FogStart 
-        Services.Lighting.FogEnd = state and 999999 or defaults.FogEnd 
+    tab:AddToggle("noFog", {Title = "No Fog", Default = false, Callback = function(state)
+        Services.Lighting.FogStart = defaults.FogStart 
+        Services.Lighting.FogEnd = defaults.FogEnd 
+        if not state then return end 
+        while Template.Options.noFog.Value do 
+            Services.Lighting.FogStart = 999999
+            Services.Lighting.FogEnd = 999999
+            task.wait()
+        end 
     end})
 end
 
@@ -346,11 +352,20 @@ end
 
 Template.Items["Fullbright"] = function(tab)
     tab:AddToggle(createSeed(), {Title = "Fullbright", Default = false, Callback = function(state)
-        Services.Lighting.FogStart = state and 999999 or defaults.FogStart 
-        Services.Lighting.FogEnd = state and 999999 or defaults.FogEnd 
-        Services.Lighting.ClockTime = state and 12 or defaults.ClockTime
-        Services.Lighting.GlobalShadows = not state
-        Services.Lighting.Brightness = state and 3 or defaults.ClockTime 
+        Services.Lighting.FogStart = defaults.FogStart 
+        Services.Lighting.FogEnd = defaults.FogEnd 
+        Services.Lighting.ClockTime = defaults.ClockTime
+        Services.Lighting.GlobalShadows = defaults.GlobalShadows
+        Services.Lighting.Brightness = defaults.ClockTime 
+        if not state then return end 
+        while Template.Options.Fullbright.Value do 
+            Services.Lighting.FogStart = 999999
+            Services.Lighting.FogEnd = 999999
+            Services.Lighting.ClockTime = 12
+            Services.Lighting.GlobalShadows = false
+            Services.Lighting.Brightness = 3
+            task.wait()
+        end
     end})
 end
 
