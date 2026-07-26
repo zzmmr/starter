@@ -351,7 +351,7 @@ Template.Items["Noclip"] = function(tab)
 end
 
 Template.Items["Fullbright"] = function(tab)
-    tab:AddToggle(createSeed(), {Title = "Fullbright", Default = false, Callback = function(state)
+    tab:AddToggle("Fullbright", {Title = "Fullbright", Default = false, Callback = function(state)
         Services.Lighting.FogStart = defaults.FogStart 
         Services.Lighting.FogEnd = defaults.FogEnd 
         Services.Lighting.ClockTime = defaults.ClockTime
