@@ -38,6 +38,7 @@ function createSeed()
 	return seed
 end
 
+defaults.RootSize = client.HumanoidRootPart.Size
 defaults.WalkSpeed = client.Humanoid.WalkSpeed 
 defaults.HipHeight = client.Humanoid.HipHeight 
 defaults.JumpPower = client.Humanoid.UseJumpPower and client.Humanoid.JumpPower or client.Humanoid.JumpHeight
@@ -90,6 +91,73 @@ function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
             task.wait(1)
         end
     end)
+end
+
+Template.Items["Hitbox Expander"] = function(tab)
+    local DEFAULT_SIZE = typeof(defaults) == "table" and defaults.RootSize or Vector3.new(2, 2, 1)
+
+    local function updateCharacterHitbox(character)
+        if not character then return end
+
+        local primaryPart = character.PrimaryPart or character:WaitForChild("HumanoidRootPart", 3)
+        if not primaryPart then return end
+
+        local isEnabled = Template.Options.enableHitboxExpander and Template.Options.enableHitboxExpander.Value or false
+        local isVisible = Template.Options.showHitboxes and Template.Options.showHitboxes.Value or false
+        local sizeValue = Template.Options.hitboxSize and Template.Options.hitboxSize.Value or 3
+
+        local targetSize = isEnabled and Vector3.new(sizeValue, sizeValue, sizeValue) or DEFAULT_SIZE
+
+        primaryPart.Size = targetSize
+        primaryPart.Transparency = (isEnabled and isVisible) and 0.7 or 1
+        
+        primaryPart.CanCollide = false 
+    end
+
+    local function updateAllHitboxes()
+        for _, player in ipairs(Services.Players:GetPlayers()) do
+            if player == Services.Players.LocalPlayer then continue end 
+            updateCharacterHitbox(player.Character)
+        end
+    end
+
+    tab:CreateSlider("hitboxSize", {
+        Title = "Hitbox Size",
+        Description = "Adjusts the size of enemy hitboxes.",
+        Default = 3,
+        Min = 1,
+        Max = 100,
+        Rounding = 0,
+        Callback = updateAllHitboxes
+    })
+
+    tab:AddToggle("showHitboxes", {
+        Title = "Show Hitboxes", 
+        Default = false, 
+        Callback = updateAllHitboxes
+    })
+
+    tab:AddToggle("enableHitboxExpander", {
+        Title = "Enable Hitbox Expander", 
+        Default = false, 
+        Callback = updateAllHitboxes
+    })
+
+    local function setupPlayer(player)
+        if player == Services.Players.LocalPlayer then return end
+        
+        player.CharacterAdded:Connect(function(char)
+            task.defer(function()
+                updateCharacterHitbox(char)
+            end)
+        end)
+    end
+
+    for _, player in ipairs(Services.Players:GetPlayers()) do
+        setupPlayer(player)
+    end
+
+    Services.Players.PlayerAdded:Connect(setupPlayer)
 end
 
 Template.Items["No Fog"] = function(tab)
