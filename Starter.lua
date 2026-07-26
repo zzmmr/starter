@@ -4,14 +4,10 @@ local Template = {
 }
 
 local Services = {
-	ReplicatedStorage = cloneref(game:GetService("ReplicatedStorage")),
 	UserInputService = cloneref(game:GetService("UserInputService")),
-	ReplicatedFirst = cloneref(game:GetService("ReplicatedFirst")),
-	TweenService = cloneref(game:GetService("TweenService")),
 	Players = cloneref(game:GetService("Players")),
 	VirtualUser = cloneref(game:GetService("VirtualUser")),
 	ProximityPromptService = cloneref(game:GetService("ProximityPromptService")),
-	HttpService = cloneref(game:GetService("HttpService")),
     Lighting = cloneref(game:GetService("Lighting")),
     RunService = cloneref(game:GetService("RunService"))
 }
@@ -215,6 +211,7 @@ Template.Items["Instant Interact"] = function(tab)
 end
 
 Template.Items["WalkSpeed"] = function(tab)
+    local firstRun = true 
     local function handleSpeed()
         if connections["WalkSpeed"] then connections["WalkSpeed"]:Disconnect() end
         if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
@@ -236,6 +233,10 @@ Template.Items["WalkSpeed"] = function(tab)
         end,
     })
     tab:AddToggle("SpeedToggle", {Title = "Enable Walk Speed", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         handleSpeed()
         if not state then
             client.Humanoid.WalkSpeed = defaults.WalkSpeed
@@ -247,6 +248,7 @@ end
 Template.Items["JumpPower"] = function(tab)
     local useJumpPower = client.Humanoid.UseJumpPower
     local property = client.Humanoid.UseJumpPower and "JumpPower" or "JumpHeight"
+    local firstRun = true 
 
     local function handleJump()
         if connections["JumpPower"] then connections["JumpPower"]:Disconnect() end
@@ -270,6 +272,10 @@ Template.Items["JumpPower"] = function(tab)
         end,
     })
     tab:AddToggle("JumpToggle", {Title = "Enable Jump", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         handleJump()
         if not state then
             client.Humanoid[property] = defaults.JumpPower
@@ -279,6 +285,8 @@ Template.Items["JumpPower"] = function(tab)
 end
 
 Template.Items["HipHeight"] = function(tab)
+    local firstRun = true 
+
     local function handleHipHeight()
         if connections["HipHeight"] then connections["HipHeight"]:Disconnect() end
         if not Template.Options.HipHeightToggle or not Template.Options.HipHeightToggle.Value then return end
@@ -302,6 +310,10 @@ Template.Items["HipHeight"] = function(tab)
     })
 
     tab:AddToggle("HipHeightToggle", {Title = "Enable Hip Height", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         handleHipHeight()
         if not state then
             client.Humanoid.HipHeight = defaults.HipHeight
@@ -311,6 +323,7 @@ Template.Items["HipHeight"] = function(tab)
 end
 
 Template.Items["Gravity"] = function(tab)
+    local firstRun = true 
     local function handleGravity()
         if connections["Gravity"] then connections["Gravity"]:Disconnect(); connections["Gravity"] = nil end
         if not Template.Options.GravityToggle or not Template.Options.GravityToggle.Value then return end
@@ -333,6 +346,10 @@ Template.Items["Gravity"] = function(tab)
         end,
     })
     tab:AddToggle("GravityToggle", {Title = "Enable Gravity", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         handleGravity()
         if not state then
             workspace.Gravity = defaults.Gravity
@@ -341,7 +358,12 @@ Template.Items["Gravity"] = function(tab)
 end
 
 Template.Items["Noclip"] = function(tab)
+    local firstRun = true 
     tab:AddToggle(createSeed(), {Title = "Noclip", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         for i, v in client.Character:GetDescendants() do
             if v:IsA("BasePart") and v.CanCollide == state then
                 v.CanCollide = not state
@@ -351,7 +373,12 @@ Template.Items["Noclip"] = function(tab)
 end
 
 Template.Items["Fullbright"] = function(tab)
+    local firstRun = true 
     tab:AddToggle("Fullbright", {Title = "Fullbright", Default = false, Callback = function(state)
+        if firstRun then 
+            firstRun = false 
+            return 
+        end 
         Services.Lighting.FogStart = defaults.FogStart 
         Services.Lighting.FogEnd = defaults.FogEnd 
         Services.Lighting.ClockTime = defaults.ClockTime
