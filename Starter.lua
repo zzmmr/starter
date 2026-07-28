@@ -174,77 +174,30 @@ Template.Items["No Fog"] = function(tab)
 end
 
 Template.Items["Fling"] = function(tab)
-    local env = {}
-
-    local function FPos(BasePart, Pos, Ang)
-        local targetCF = CFrame.new(BasePart.Position) * Pos * Ang
-        client.HumanoidRootPart.CFrame = targetCF
-        client.Character:SetPrimaryPartCFrame(targetCF)
-        client.HumanoidRootPart.Velocity = Vector3.new(9e7, 9e8, 9e7)
-        client.HumanoidRootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
-    end
-
-    local function SFBasePart(BasePart, THumanoid)
-        local start = tick()
-        local angle = 0
-        env.timeout = env.timeout or 2.5
-        repeat
-            if client.HumanoidRootPart and THumanoid then
-                angle += 100
-                for _, offset in ipairs{CFrame.new(0, 1.5, 0),CFrame.new(0, -1.5, 0),CFrame.new(2.25, 1.5, -2.25),CFrame.new(-2.25, -1.5, 2.25)} do
-                    FPos(BasePart, offset + THumanoid.MoveDirection, CFrame.Angles(math.rad(angle), 0, 0))
-                    task.wait()
-                end
-            end
-        until BasePart.Velocity.Magnitude > 500 or tick() - start > env.timeout
-    end
-
-    local function fling(TargetPlayer)
-        if not (client.Character and client.Humanoid and client.HumanoidRootPart) then return end
-        local TCharacter = TargetPlayer.Character
-        if not TCharacter then return end
-
-        local THumanoid = TCharacter:FindFirstChildOfClass("Humanoid")
-        local TRootPart = THumanoid and THumanoid.RootPart
-        local THead = TCharacter:FindFirstChild("Head")
-        local Accessory = TCharacter:FindFirstChildOfClass("Accessory")
-        local Handle = Accessory and Accessory:FindFirstChild("Handle")
-    
-        env.OldPos = client.HumanoidRootPart.CFrame
-
-        repeat task.wait()
-            workspace.CurrentCamera.CameraSubject = THead or Handle or THumanoid
-        until workspace.CurrentCamera.CameraSubject == THead or Handle or THumanoid
-
-        local BV = Instance.new("BodyVelocity")
-        BV.Name = ""
-        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
-        BV.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-        BV.Parent = client.HumanoidRootPart
-
-        client.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
-        local target = TRootPart or THead or Handle
-        if target then SFBasePart(target, THumanoid) end
-
-        BV:Destroy()
-        client.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
-
-        repeat task.wait()
-            workspace.CurrentCamera.CameraSubject = client.Humanoid
-        until workspace.CurrentCamera.CameraSubject == client.Humanoid
-
-        repeat
-            local cf = env.OldPos * CFrame.new(0, .5, 0)
-            client.HumanoidRootPart.CFrame = cf
-            client.Character:SetPrimaryPartCFrame(cf)
-            client.Humanoid:ChangeState("GettingUp")
-            for _, part in ipairs(client.Character:GetChildren()) do
-                if part:IsA("BasePart") then
-                    part.Velocity, part.RotVelocity = Vector3.zero, Vector3.zero
-                end
-            end
+    local function fling(player)
+        local t = tick()
+        local char = player.Character
+        local hrp = char and char.PrimaryPart
+        local oldPos = client.HumanoidRootPart.CFrame
+        if not char or not hrp then return end 
+        while hrp.Velocity.Magnitude < 500 and tick()-t<3 do
+            client.HumanoidRootPart.CFrame = CFrame.new(hrp.Position)
+            client.HumanoidRootPart.Velocity = Vector3.new(9e7, 9e8, 9e7)
+            client.HumanoidRootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8) 
             task.wait()
-        until (client.HumanoidRootPart.Position - env.OldPos.p).Magnitude < 25
+        end 
+        task.wait(.3)
+        while (client.HumanoidRootPart.Position-oldPos.Position).Magnitude>2 do 
+            client.HumanoidRootPart.CFrame = oldPos
+            client.Humanoid:ChangeState("GettingUp")
+            for _, part in client.Character:GetChildren() do 
+                if part:IsA("BasePart") then 
+                    part.Velocity, part.RotVelocity = Vector3.zero, Vector3.zero
+                end 
+            end 
+            task.wait()
+        end 
+        return true 
     end
 
     local flingPlayerDropdown = tab:CreateDropdown("flingPlayerDropdown", {
