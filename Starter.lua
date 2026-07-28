@@ -180,10 +180,16 @@ Template.Items["Fling"] = function(tab)
         local hrp = char and char.PrimaryPart
         local oldPos = client.HumanoidRootPart.CFrame
         if not char or not hrp then return end 
+
         while hrp.Velocity.Magnitude < 500 and tick()-t<3 do
-            client.HumanoidRootPart.CFrame = CFrame.new(hrp.Position)
-            client.HumanoidRootPart.Velocity = Vector3.new(9e7, 9e8, 9e7)
-            client.HumanoidRootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8) 
+            client.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(Vector3.new(0,0,-0.5))
+            RunService.Heartbeat:Wait()
+            local vel = client.HumanoidRootPart.Velocity
+            client.HumanoidRootPart.Velocity = vel * 99999999 + Vector3.new(0, 99999999, 0)
+            RunService.RenderStepped:Wait()
+            client.HumanoidRootPart.Velocity = vel
+            RunService.Stepped:Wait()
+            client.HumanoidRootPart.Velocity = vel + Vector3.new(0, 0.1, 0)
             task.wait()
         end 
         task.wait(.3)
