@@ -93,6 +93,52 @@ function Template:BuildHomeSection(tab, LRM_TotalExecutions, LRM_SecondsLeft)
     end)
 end
 
+function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_SecondsLeft)
+    local function secondsToFormattedDate(secondsLeft)
+        local succ, result = pcall(function()
+            local t = os.time() + (tonumber(secondsLeft) or 0)
+            local hour = tonumber(os.date("%I", t))
+            local minute = tonumber(os.date("%M", t))
+            local ampm = os.date("%p", t)
+            local dateStr = os.date("%B %d, %Y", t):gsub("(%d)", "%1") 
+            return string.format("%s %d:%02d %s", dateStr, hour, minute, ampm)
+        end)
+        return succ and result or "Couldn't format date."
+    end
+
+    local InformationSection = tab:AddSection({Title = "Information", Column = 1})
+    InformationSection:AddParagraph("sessionTime", {Title = "Session Time", Content = "0s"})
+    InformationSection:AddKeybind("MinimizeKeybind", {
+        Title = "Minimize Keybind",
+        Mode = "Toggle",
+        Default = Enum.KeyCode.LeftControl,
+        ChangedCallback = function(New)
+            Window.MinimizeKey = New 
+        end,
+    })
+
+    local KeyDataSection = tab:AddSection({Title = "Key Data", Column = 1})
+    KeyDataSection:AddParagraph("TotalExecutions", {Title = "Total Executions", Content =  (LRM_TotalExecutions or 0) .. " Executions"})
+    KeyDataSection:AddParagraph("KeyExpiration", {Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft)})
+
+    local DiscordSection = tab:AddSection({Title = "Discord", Column = 1})
+    DiscordSection:AddButton({Title = "Copy Discord Invite", Description = "Copies the Discord invite link to your clipboard.", Callback = function() setclipboard("https://discord.gg/7MJrswRyJX") end})
+    
+    task.spawn(function()
+        local startTime = tick()
+
+        while true do
+            local elapsed = tick() - startTime
+            Template.Options.sessionTime:SetContent(string.format("%02d:%02d:%02d", 
+                math.floor(elapsed / 3600),  
+                math.floor((elapsed % 3600) / 60), 
+                math.floor(elapsed % 60)
+            ))
+            task.wait(1)
+        end
+    end)
+end
+
 Template.Items["Hitbox Expander"] = function(tab)
     local DEFAULT_SIZE = typeof(defaults) == "table" and defaults.RootSize or Vector3.new(2, 2, 1)
 
