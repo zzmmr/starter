@@ -107,7 +107,7 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
     end
 
     local InformationSection = tab:AddSection({Title = "Information", Column = 1})
-    InformationSection:AddParagraph("sessionTime", {Title = "Session Time", Content = "0s"})
+    local SessionTime = InformationSection:AddParagraph("sessionTime", {Title = "Session Time", Content = "0s"})
     InformationSection:AddKeybind("MinimizeKeybind", {
         Title = "Minimize Keybind",
         Mode = "Toggle",
@@ -129,7 +129,7 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
 
         while true do
             local elapsed = tick() - startTime
-            Template.Options.sessionTime:SetContent(string.format("%02d:%02d:%02d", 
+            SessionTime:SetContent(string.format("%02d:%02d:%02d", 
                 math.floor(elapsed / 3600),  
                 math.floor((elapsed % 3600) / 60), 
                 math.floor(elapsed % 60)
