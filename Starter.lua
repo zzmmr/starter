@@ -107,7 +107,7 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
     end
 
     local InformationSection = tab:AddSection({Title = "Information", Column = 1})
-    local SessionTime = InformationSection:AddParagraph("sessionTime", {Title = "Session Time", Content = "0s"})
+    local SessionTime = InformationSection:AddParagraph({Title = "Session Time", Content = "0s"})
     InformationSection:AddKeybind("MinimizeKeybind", {
         Title = "Minimize Keybind",
         Mode = "Toggle",
@@ -118,8 +118,8 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
     })
 
     local KeyDataSection = tab:AddSection({Title = "Key Data", Column = 1})
-    KeyDataSection:AddParagraph("TotalExecutions", {Title = "Total Executions", Content =  (LRM_TotalExecutions or 0) .. " Executions"})
-    KeyDataSection:AddParagraph("KeyExpiration", {Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft)})
+    KeyDataSection:AddParagraph({Title = "Total Executions", Content =  (LRM_TotalExecutions or 0) .. " Executions"})
+    KeyDataSection:AddParagraph({Title = "Key Expiration Date", Content = secondsToFormattedDate(LRM_SecondsLeft)})
 
     local DiscordSection = tab:AddSection({Title = "Discord", Column = 1})
     DiscordSection:AddButton({Title = "Copy Discord Invite", Description = "Copies the Discord invite link to your clipboard.", Callback = function() setclipboard("https://discord.gg/7MJrswRyJX") end})
