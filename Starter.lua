@@ -432,14 +432,22 @@ end
 
 Template.Items["Noclip"] = function(tab)
     local firstRun = true 
-    tab:AddToggle(createSeed(), {Title = "Noclip", Default = false, Callback = function(state)
+    tab:AddToggle("Noclip", {Title = "Noclip", Default = false, Callback = function(state)
         if firstRun then 
             firstRun = false 
             return 
         end 
+        while Template.Options.Noclip.Value do 
+            for i, v in client.Character:GetDescendants() do
+                if v:IsA("BasePart") and v.CanCollide == state then
+                    v.CanCollide = false
+                end
+            end
+            task.wait()
+        end
         for i, v in client.Character:GetDescendants() do
             if v:IsA("BasePart") and v.CanCollide == state then
-                v.CanCollide = not state
+                v.CanCollide = true
             end
         end
     end})
