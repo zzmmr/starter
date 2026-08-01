@@ -1,6 +1,7 @@
 local Template = {
     Items = {},
-    Options = nil, 
+    Options = nil,
+    client = {} 
 }
 
 local Services = {
@@ -14,23 +15,22 @@ local Services = {
 
 local player = Services.Players.LocalPlayer 
 
-local client = {}
 local defaults = {}
 local connections = {}
 local characterAddedConnections = {}
 local seedCount = 0 
 
 local function refreshClientData()
-	client.Character = player.Character or player.CharacterAdded:Wait()
-	client.Humanoid = client.Character:WaitForChild("Humanoid")
-	client.HumanoidRootPart = client.Character:WaitForChild("HumanoidRootPart")
+	Template.client.Character = player.Character or player.CharacterAdded:Wait()
+	Template.client.Humanoid = Template.client.Character:WaitForChild("Humanoid")
+	Template.client.HumanoidRootPart = Template.client.Character:WaitForChild("HumanoidRootPart")
     for _, func in characterAddedConnections do 
         func()
     end 
 end
 
 player.CharacterAdded:Connect(refreshClientData)
-refreshClientData()
+task.spawn(refreshClientData)
 
 function createSeed()
 	local seed = "Seed_"..seedCount
@@ -38,10 +38,10 @@ function createSeed()
 	return seed
 end
 
-defaults.RootSize = client.HumanoidRootPart.Size
-defaults.WalkSpeed = client.Humanoid.WalkSpeed 
-defaults.HipHeight = client.Humanoid.HipHeight 
-defaults.JumpPower = client.Humanoid.UseJumpPower and client.Humanoid.JumpPower or client.Humanoid.JumpHeight
+defaults.RootSize = Template.client.HumanoidRootPart.Size
+defaults.WalkSpeed = Template.client.Humanoid.WalkSpeed 
+defaults.HipHeight = Template.client.Humanoid.HipHeight 
+defaults.JumpPower = Template.client.Humanoid.UseJumpPower and Template.client.Humanoid.JumpPower or Template.client.Humanoid.JumpHeight
 defaults.ClockTime = Services.Lighting.ClockTime 
 defaults.GlobalShadows = Services.Lighting.GlobalShadows
 defaults.Brightness = Services.Lighting.Brightness
@@ -224,25 +224,25 @@ Template.Items["Fling"] = function(tab)
         local t = tick()
         local char = player.Character
         local hrp = char and char.PrimaryPart
-        local oldPos = client.HumanoidRootPart.CFrame
+        local oldPos = Template.client.HumanoidRootPart.CFrame
         if not char or not hrp then return end 
 
         while hrp.Velocity.Magnitude < 500 and tick()-t<3 do
-            client.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(Vector3.new(0,0,-0.5))
+            Template.client.HumanoidRootPart.CFrame = hrp.CFrame * CFrame.new(Vector3.new(0,0,-0.5))
             RunService.Heartbeat:Wait()
-            local vel = client.HumanoidRootPart.Velocity
-            client.HumanoidRootPart.Velocity = vel * 99999999 + Vector3.new(0, 99999999, 0)
+            local vel = Template.client.HumanoidRootPart.Velocity
+            Template.client.HumanoidRootPart.Velocity = vel * 99999999 + Vector3.new(0, 99999999, 0)
             RunService.RenderStepped:Wait()
-            client.HumanoidRootPart.Velocity = vel
+            Template.client.HumanoidRootPart.Velocity = vel
             RunService.Stepped:Wait()
-            client.HumanoidRootPart.Velocity = vel + Vector3.new(0, 0.1, 0)
+            Template.client.HumanoidRootPart.Velocity = vel + Vector3.new(0, 0.1, 0)
             task.wait()
         end 
         task.wait(.3)
-        while (client.HumanoidRootPart.Position-oldPos.Position).Magnitude>2 do 
-            client.HumanoidRootPart.CFrame = oldPos
-            client.Humanoid:ChangeState("GettingUp")
-            for _, part in client.Character:GetChildren() do 
+        while (Template.client.HumanoidRootPart.Position-oldPos.Position).Magnitude>2 do 
+            Template.client.HumanoidRootPart.CFrame = oldPos
+            Template.client.Humanoid:ChangeState("GettingUp")
+            for _, part in Template.client.Character:GetChildren() do 
                 if part:IsA("BasePart") then 
                     part.Velocity, part.RotVelocity = Vector3.zero, Vector3.zero
                 end 
@@ -288,10 +288,10 @@ Template.Items["WalkSpeed"] = function(tab)
     local function handleSpeed()
         if connections["WalkSpeed"] then connections["WalkSpeed"]:Disconnect() end
         if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
-        connections["WalkSpeed"] = client.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-            client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
+        connections["WalkSpeed"] = Template.client.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+            Template.client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
         end)
-        client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
+        Template.client.Humanoid.WalkSpeed = Template.Options.WalkSpeedSlider.Value
     end 
     tab:AddSlider("WalkSpeedSlider", {
         Title = "Walk Speed",
@@ -302,7 +302,7 @@ Template.Items["WalkSpeed"] = function(tab)
         Rounding = 1,
         Callback = function(value) 
             if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
-            client.Humanoid["WalkSpeed"] = value 
+            Template.client.Humanoid["WalkSpeed"] = value 
         end,
     })
     tab:AddToggle("SpeedToggle", {Title = "Enable Walk Speed", Default = false, Callback = function(state)
@@ -312,24 +312,24 @@ Template.Items["WalkSpeed"] = function(tab)
         end 
         handleSpeed()
         if not state then
-            client.Humanoid.WalkSpeed = defaults.WalkSpeed
+            Template.client.Humanoid.WalkSpeed = defaults.WalkSpeed
         end  
     end})
     table.insert(characterAddedConnections, handleSpeed)
 end
 
 Template.Items["JumpPower"] = function(tab)
-    local useJumpPower = client.Humanoid.UseJumpPower
-    local property = client.Humanoid.UseJumpPower and "JumpPower" or "JumpHeight"
+    local useJumpPower = Template.client.Humanoid.UseJumpPower
+    local property = Template.client.Humanoid.UseJumpPower and "JumpPower" or "JumpHeight"
     local firstRun = true 
 
     local function handleJump()
         if connections["JumpPower"] then connections["JumpPower"]:Disconnect() end
         if not Template.Options.JumpToggle or not Template.Options.JumpToggle.Value then return end
-        connections["JumpPower"] = client.Humanoid:GetPropertyChangedSignal(property):Connect(function()
-            client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
+        connections["JumpPower"] = Template.client.Humanoid:GetPropertyChangedSignal(property):Connect(function()
+            Template.client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
         end)
-        client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
+        Template.client.Humanoid[property] = Template.Options.JumpPowerSlider.Value
     end
 
     tab:AddSlider("JumpPowerSlider", {
@@ -341,7 +341,7 @@ Template.Items["JumpPower"] = function(tab)
         Rounding = 1,
         Callback = function(value) 
             if not Template.Options.JumpToggle or not Template.Options.JumpToggle.Value then return end 
-            client.Humanoid[property] = value 
+            Template.client.Humanoid[property] = value 
         end,
     })
     tab:AddToggle("JumpToggle", {Title = "Enable Jump", Default = false, Callback = function(state)
@@ -351,7 +351,7 @@ Template.Items["JumpPower"] = function(tab)
         end 
         handleJump()
         if not state then
-            client.Humanoid[property] = defaults.JumpPower
+            Template.client.Humanoid[property] = defaults.JumpPower
         end
     end})
     table.insert(characterAddedConnections, handleJump)
@@ -363,10 +363,10 @@ Template.Items["HipHeight"] = function(tab)
     local function handleHipHeight()
         if connections["HipHeight"] then connections["HipHeight"]:Disconnect() end
         if not Template.Options.HipHeightToggle or not Template.Options.HipHeightToggle.Value then return end
-        connections["HipHeight"] = client.Humanoid:GetPropertyChangedSignal("HipHeight"):Connect(function()
-            client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
+        connections["HipHeight"] = Template.client.Humanoid:GetPropertyChangedSignal("HipHeight"):Connect(function()
+            Template.client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
         end)
-        client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
+        Template.client.Humanoid.HipHeight = Template.Options.HipHeightSlider.Value
     end
 
     tab:AddSlider("HipHeightSlider", {
@@ -378,7 +378,7 @@ Template.Items["HipHeight"] = function(tab)
         Rounding = 1,
         Callback = function(value) 
             if not Template.Options.HipHeightToggle or not Template.Options.HipHeightToggle.Value then return end 
-            client.Humanoid["HipHeight"] = value 
+            Template.client.Humanoid["HipHeight"] = value 
         end,
     })
 
@@ -389,7 +389,7 @@ Template.Items["HipHeight"] = function(tab)
         end 
         handleHipHeight()
         if not state then
-            client.Humanoid.HipHeight = defaults.HipHeight
+            Template.client.Humanoid.HipHeight = defaults.HipHeight
         end
     end})
     table.insert(characterAddedConnections, handleHipHeight)
@@ -438,14 +438,14 @@ Template.Items["Noclip"] = function(tab)
             return 
         end 
         while Template.Options.Noclip.Value do 
-            for i, v in client.Character:GetDescendants() do
+            for i, v in Template.client.Character:GetDescendants() do
                 if v:IsA("BasePart") and v.CanCollide == state then
                     v.CanCollide = false
                 end
             end
             task.wait()
         end
-        for i, v in client.Character:GetDescendants() do
+        for i, v in Template.client.Character:GetDescendants() do
             if v:IsA("BasePart") and v.CanCollide == state then
                 v.CanCollide = true
             end
@@ -482,7 +482,7 @@ Template.Items["Infinite Jump"] = function(tab)
         if connections["Infinite Jump"] then connections["Infinite Jump"]:Disconnect() end 
         if not state then return end 
         connections["Infinite Jump"] = Services.UserInputService.JumpRequest:Connect(function()
-            client.Humanoid:ChangeState("Jumping")
+            Template.client.Humanoid:ChangeState("Jumping")
         end)
     end})
 end
@@ -550,7 +550,7 @@ Template.Items["Fly"] = function(tab)
         if alignOrientation then alignOrientation:Destroy(); alignOrientation = nil end
         if attachment then attachment:Destroy(); attachment = nil end
 
-        local humanoid = client.Humanoid
+        local humanoid = Template.client.Humanoid
         if humanoid and humanoid.Parent then
             humanoid.PlatformStand = false
             humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
@@ -560,8 +560,8 @@ Template.Items["Fly"] = function(tab)
     local function startFly()
         stopFly()
 
-        local humanoid = client.Humanoid
-        local rootPart = client.HumanoidRootPart
+        local humanoid = Template.client.Humanoid
+        local rootPart = Template.client.HumanoidRootPart
         if not (humanoid and rootPart) then return end
 
         attachment = Instance.new("Attachment")
@@ -585,7 +585,7 @@ Template.Items["Fly"] = function(tab)
         diedConn = humanoid.Died:Connect(stopFly)
 
         connections["Fly"] = Services.RunService.RenderStepped:Connect(function()
-            local root = client.HumanoidRootPart
+            local root = Template.client.HumanoidRootPart
             if not (root and root.Parent) then return end
 
             local camera = workspace.CurrentCamera
