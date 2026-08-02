@@ -10,7 +10,8 @@ local Services = {
 	VirtualUser = cloneref(game:GetService("VirtualUser")),
 	ProximityPromptService = cloneref(game:GetService("ProximityPromptService")),
     Lighting = cloneref(game:GetService("Lighting")),
-    RunService = cloneref(game:GetService("RunService"))
+    RunService = cloneref(game:GetService("RunService")),
+    TeleportService = cloneref(game:GetService("TeleportService"))
 }
 
 local player = Services.Players.LocalPlayer 
@@ -38,18 +39,20 @@ function createSeed()
 	return seed
 end
 
-pcall(function()
-    defaults.RootSize = Template.client.HumanoidRootPart.Size
-    defaults.WalkSpeed = Template.client.Humanoid.WalkSpeed 
-    defaults.HipHeight = Template.client.Humanoid.HipHeight 
-    defaults.JumpPower = Template.client.Humanoid.UseJumpPower and Template.client.Humanoid.JumpPower or Template.client.Humanoid.JumpHeight
-    defaults.ClockTime = Services.Lighting.ClockTime 
-    defaults.GlobalShadows = Services.Lighting.GlobalShadows
-    defaults.Brightness = Services.Lighting.Brightness
-    defaults.FogStart = Services.Lighting.FogStart 
-    defaults.FogEnd = Services.Lighting.FogEnd 
-    defaults.Gravity= workspace.Gravity
-end)
+while not Template.client.HumanoidRootPart or not Template.client.Humanoid do 
+    task.wait(.1)
+end
+
+defaults.RootSize = Template.client.HumanoidRootPart.Size
+defaults.WalkSpeed = Template.client.Humanoid.WalkSpeed 
+defaults.HipHeight = Template.client.Humanoid.HipHeight 
+defaults.JumpPower = Template.client.Humanoid.UseJumpPower and Template.client.Humanoid.JumpPower or Template.client.Humanoid.JumpHeight
+defaults.ClockTime = Services.Lighting.ClockTime 
+defaults.GlobalShadows = Services.Lighting.GlobalShadows
+defaults.Brightness = Services.Lighting.Brightness
+defaults.FogStart = Services.Lighting.FogStart 
+defaults.FogEnd = Services.Lighting.FogEnd 
+defaults.Gravity= workspace.Gravity
 
 function Template:Import(item: string, tab)
     if not Template.Items[item] then return end 
@@ -140,6 +143,66 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
         end
     end)
 end
+
+Template.Items["Server Hop"] = function(tab)
+    tab:AddButton("serverHop", {
+        Title = "Server Hop", 
+        Default = false, 
+        Callback = function()
+            local servers = {}
+            local servers = {}
+            local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+            local body = Services.HttpService:JSONDecode(req)
+
+            if body and body.data then
+                for i, v in next, body.data do
+                    if type(v) == "table" and tonumber(v.playing) and tonumber(v.maxPlayers) and v.playing < v.maxPlayers and v.id ~= JobId then
+                        table.insert(servers, 1, v.id)
+                    end
+                end
+            end
+
+            if #servers > 0 then
+                Services.TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], player)
+            end
+        end
+    })
+end
+
+Template.Items["Rejoin"] = function(tab)
+    tab:AddButton("rejoin", {
+        Title = "Rejoin", 
+        Default = false, 
+        Callback = function()
+            Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, player)
+        end
+    })
+end
+
+Template.Items["Join Small Server"] = function(tab)
+    tab:AddButton("joinSmallServer", {
+        Title = "Join Small Server", 
+        Default = false, 
+        Callback = function()
+            local Api = "https://games.roblox.com/v1/games/"
+            local _servers = Api..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
+
+            function ListServers(cursor)
+                local Raw = game:HttpGet(_servers .. ((cursor and "&cursor="..cursor) or ""))
+                return Services.HttpService:JSONDecode(Raw)
+            end
+
+            local Server, Next; repeat
+                local Servers = ListServers(Next)
+                Server = Servers.data[1]
+                Next = Servers.nextPageCursor
+            until Server
+
+            Services.TeleportService:TeleportToPlaceInstance(game.PlaceId,Server.id,player)
+        end
+    })
+end
+
 
 Template.Items["Hitbox Expander"] = function(tab)
     local DEFAULT_SIZE = typeof(defaults) == "table" and defaults.RootSize or Vector3.new(2, 2, 1)
