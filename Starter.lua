@@ -145,7 +145,7 @@ function Template:BuildNovaHomeSection(Window, tab, LRM_TotalExecutions, LRM_Sec
 end
 
 Template.Items["Server Hop"] = function(tab)
-    tab:AddButton("serverHop", {
+    tab:AddButton({
         Title = "Server Hop", 
         Default = false, 
         Callback = function()
@@ -170,7 +170,7 @@ Template.Items["Server Hop"] = function(tab)
 end
 
 Template.Items["Rejoin"] = function(tab)
-    tab:AddButton("rejoin", {
+    tab:AddButton({
         Title = "Rejoin", 
         Default = false, 
         Callback = function()
@@ -180,7 +180,7 @@ Template.Items["Rejoin"] = function(tab)
 end
 
 Template.Items["Join Small Server"] = function(tab)
-    tab:AddButton("joinSmallServer", {
+    tab:AddButton({
         Title = "Join Small Server", 
         Default = false, 
         Callback = function()
