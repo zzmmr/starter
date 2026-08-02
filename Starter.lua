@@ -1,7 +1,8 @@
 local Template = {
     Items = {},
     Options = nil,
-    client = {} 
+    client = {}, 
+    DefaultsLoaded = false, 
 }
 
 local Services = {
@@ -40,20 +41,23 @@ function createSeed()
 	return seed
 end
 
-while not Template.client.HumanoidRootPart or not Template.client.Humanoid do 
-    task.wait(.1)
-end
+task.spawn(function()
+    while not Template.client.HumanoidRootPart or not Template.client.Humanoid do 
+        task.wait(.1)
+    end
 
-defaults.RootSize = Template.client.HumanoidRootPart.Size
-defaults.WalkSpeed = Template.client.Humanoid.WalkSpeed 
-defaults.HipHeight = Template.client.Humanoid.HipHeight 
-defaults.JumpPower = Template.client.Humanoid.UseJumpPower and Template.client.Humanoid.JumpPower or Template.client.Humanoid.JumpHeight
-defaults.ClockTime = Services.Lighting.ClockTime 
-defaults.GlobalShadows = Services.Lighting.GlobalShadows
-defaults.Brightness = Services.Lighting.Brightness
-defaults.FogStart = Services.Lighting.FogStart 
-defaults.FogEnd = Services.Lighting.FogEnd 
-defaults.Gravity= workspace.Gravity
+    defaults.RootSize = Template.client.HumanoidRootPart.Size
+    defaults.WalkSpeed = Template.client.Humanoid.WalkSpeed 
+    defaults.HipHeight = Template.client.Humanoid.HipHeight 
+    defaults.JumpPower = Template.client.Humanoid.UseJumpPower and Template.client.Humanoid.JumpPower or Template.client.Humanoid.JumpHeight
+    defaults.ClockTime = Services.Lighting.ClockTime 
+    defaults.GlobalShadows = Services.Lighting.GlobalShadows
+    defaults.Brightness = Services.Lighting.Brightness
+    defaults.FogStart = Services.Lighting.FogStart 
+    defaults.FogEnd = Services.Lighting.FogEnd 
+    defaults.Gravity= workspace.Gravity
+    Template.DefaultsLoaded = true 
+end)
 
 function Template:Import(item: string, tab)
     if not Template.Items[item] then return end 
