@@ -11,7 +11,8 @@ local Services = {
 	ProximityPromptService = cloneref(game:GetService("ProximityPromptService")),
     Lighting = cloneref(game:GetService("Lighting")),
     RunService = cloneref(game:GetService("RunService")),
-    TeleportService = cloneref(game:GetService("TeleportService"))
+    TeleportService = cloneref(game:GetService("TeleportService")),
+    HttpService = cloneref(game:GetService("HttpService"))
 }
 
 local player = Services.Players.LocalPlayer 
@@ -151,7 +152,7 @@ Template.Items["Server Hop"] = function(tab)
         Callback = function()
             local servers = {}
             local servers = {}
-            local req = game:HttpGet("https://games.roblox.com/v1/games/" .. PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
+            local req = game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Desc&limit=100&excludeFullGames=true")
             local body = Services.HttpService:JSONDecode(req)
 
             if body and body.data then
@@ -163,7 +164,7 @@ Template.Items["Server Hop"] = function(tab)
             end
 
             if #servers > 0 then
-                Services.TeleportService:TeleportToPlaceInstance(PlaceId, servers[math.random(1, #servers)], player)
+                Services.TeleportService:TeleportToPlaceInstance(game.PlaceId, servers[math.random(1, #servers)], player)
             end
         end
     })
