@@ -368,7 +368,7 @@ Template.Items["WalkSpeed"] = function(tab)
         Description = "",
         Default = defaults.WalkSpeed,
         Min = 0,
-        Max = 300,
+        Max = 500,
         Rounding = 1,
         Callback = function(value) 
             if not Template.Options.SpeedToggle or not Template.Options.SpeedToggle.Value then return end 
